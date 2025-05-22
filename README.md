@@ -213,6 +213,8 @@ WHERE r.distance != 0
 GROUP BY c.customer_id
 ORDER BY c.customer_id;
 
+select *from pizza_runner.customer_orders
+
 ----
 
 
@@ -220,5 +222,33 @@ ORDER BY c.customer_id;
 
 
 --8.How many pizzas were delivered that had both exclusions and extras?
-What was the total volume of pizzas ordered for each hour of the day?
-What was the volume of orders for each day of the week?
+
+SELECT  
+  SUM(
+    CASE WHEN exclusions IS NOT NULL AND extras IS NOT NULL THEN 1
+    ELSE 0
+    END) AS pizza_count_w_exclusions_extras
+FROM pizza_runner.customer_orders AS c
+JOIN pizza_runner.runner_orders AS r
+  ON c.order_id = r.order_id
+WHERE r.distance >= 1 
+  AND exclusions <> ' ' 
+  AND extras <> ' ';
+
+
+--9.What was the total volume of pizzas ordered for each hour of the day?
+select *from pizza_runner.customer_orders
+
+select DATEPART(hour,order_time) as hour_of_day , count(order_id) as number_of_counts from pizza_runner.customer_orders
+group by DATEPART(hour,order_time)  
+ 
+
+--10.What was the volume of orders for each day of the week?
+
+SELECT 
+  DATENAME(weekday, order_time) AS day_of_week,
+  COUNT(order_id) AS number_of_counts
+FROM pizza_runner.customer_orders
+GROUP BY DATENAME(weekday, order_time)
+
+ 
